@@ -20,6 +20,13 @@ public:
     static bool symbolically_same(Predicate P1,Predicate P2);
     static bool symbolically_different(Predicate P1,Predicate P2);
     Predicate(SymbolicPredicate *_P,const std::vector<Literal> &_args={},bool _negated=false);
+    Predicate(SymbolicPreposition *_P,bool _negated=false);
+
+    template<typename T>
+    Predicate(SymbolicPredicate_1 *_P,T k,bool _negated=false):P(_P),negated(_negated) {
+        args.emplace_back(k);
+    }
+
     Predicate();
     const std::vector<Literal> get_args() const;
     Predicate operator~() const;

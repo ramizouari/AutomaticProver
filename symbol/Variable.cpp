@@ -11,3 +11,11 @@ int Variable::arg_count() {
 bool Variable::is_variable() {
     return true;
 }
+
+Variable::Variable():id(counter) {
+    counter++;
+}
+
+int Variable::variable_id() const {
+    return id;
+}

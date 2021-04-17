@@ -70,3 +70,7 @@ bool Predicate::operator==(Predicate predicate) const {
 Predicate::Predicate() :P(nullptr){
 
 }
+
+Predicate::Predicate(SymbolicPreposition *_P, bool _negated):P(_P),negated(_negated) {
+
+}

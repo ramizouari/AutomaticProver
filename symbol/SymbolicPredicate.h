@@ -6,12 +6,12 @@
 #define AUTOMATICPROVER_SYMBOLICPREDICATE_H
 #include "Symbol.h"
 
-class SymbolicPredicate :public Symbol{
+class SymbolicPredicate :virtual public Symbol{
     const int n;
 public:
     SymbolicPredicate(int _n);
-    int arg_count() override;
-    bool is_variable() override;
+    virtual int arg_count() override;
+    virtual bool is_variable() override;
 };
 
 template<int p>
@@ -21,5 +21,8 @@ public:
     SymbolicPredicate_p(): SymbolicPredicate(p){}
 };
 using SymbolicPreposition=SymbolicPredicate_p<0>;
+using SymbolicPredicate_1=SymbolicPredicate_p<1>;
+using SymbolicPredicate_2=SymbolicPredicate_p<2>;
+using SymbolicPredicate_3=SymbolicPredicate_p<3>;
 
 #endif //AUTOMATICPROVER_SYMBOLICPREDICATE_H

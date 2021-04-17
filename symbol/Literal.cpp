@@ -85,3 +85,19 @@ Literal::Literal(SymbolicConstant *f):Literal(f,{}) {
 
 }
 
+Symbol* Literal::get() {
+    return S;
+}
+
+template<typename T>
+Literal::Literal(SymbolicFunction_p<1> *c,T k):S(c),args(1,k) {
+
+}
+
+template<typename T1, typename T2>
+Literal::Literal(SymbolicFunction_p<2> *c, T1 K1, T2 K2):S(c)
+{
+    args.emplace_back(K1);
+    args.emplace_back(K2);
+}
+

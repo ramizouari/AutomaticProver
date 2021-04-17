@@ -30,6 +30,22 @@ inline Literal pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Claus
         return a;
     else if(!a.is_variable() && !b.is_variable())
         return {};
+    else if(a.is_variable() && b.is_variable())
+    {
+        auto p = dynamic_cast<Variable*>(a.get()),q=dynamic_cast<Variable*>(b.get());
+        if(p->variable_id() > q->variable_id())
+        {
+            C.rename(a,b);
+            D.rename(a,b);
+            return a;
+        }
+        else
+        {
+            C.rename(b,a);
+            D.rename(b,a);
+            return b;
+        }
+    }
     else if(a.is_variable())
     {
         if(b.contains(a))  return {};

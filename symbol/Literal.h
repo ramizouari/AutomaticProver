@@ -9,8 +9,10 @@
 #include <vector>
 #include <random>
 #include <variant>
+#include "IdentifiedSymbol.h"
 
-class Literal {
+class Literal : virtual public Identifiable<std::string> {
+protected:
     Symbol *S;
     std::vector<Literal> args;
     friend class std::hash<Literal>;
@@ -18,7 +20,11 @@ class Literal {
 public:
     Literal();
     Literal(Variable *v);
-    Literal(Symbol *f,const std::vector<Literal> &_args);
+    Literal(Symbol *f,const std::vector<Literal> &_args={});
+    template<typename T>
+    Literal(SymbolicFunction_p<1>*c,T K);
+    template<typename T1,typename T2>
+    Literal(SymbolicFunction_p<2>*c,T1 K1,T2 K2);
     Literal(SymbolicConstant *c);
     bool operator!=(Literal L) const;
     bool operator==(Literal L) const;
@@ -30,7 +36,24 @@ public:
     bool operator==(const Literal &c);
     bool operator!=(const Literal &c);
     bool is_variable() const;
+    Symbol* get();
     int count_variables() const;
+
+    std::string get_name() override
+    {
+        std::string R=dynamic_cast<IdentifiableSymbol<std::string>*>(S)->get_name();
+        int n=args.size();
+        if(n>0)
+        {
+            R += '(';
+            for (int i = 0; i < n - 1; i++)
+                R += args[i].get_name() + ", ";
+
+            R+= args.back().get_name();
+            R+=')';
+        }
+        return R;
+    }
 };
 
 template<>
