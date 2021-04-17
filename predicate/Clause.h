@@ -48,12 +48,16 @@ inline std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,
         {
             C.rename(a,b);
             D.rename(a,b);
+            E.rename(a,b);
+            F.rename(a,b);
             return a;
         }
         else
         {
             C.rename(b,a);
             D.rename(b,a);
+            E.rename(b,a);
+            F.rename(b,a);
             return b;
         }
     }
@@ -62,6 +66,8 @@ inline std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,
         if(b.contains(a))  return std::nullopt;
         C.rename(a,b);
         D.rename(a,b);
+        E.rename(a,b);
+        F.rename(a,b);
         return b;
     }
     else if(b.is_variable())
@@ -69,6 +75,8 @@ inline std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,
         if(a.contains(b)) return std::nullopt;
         C.rename(b,a);
         D.rename(b,a);
+        E.rename(b,a);
+        F.rename(b,a);
         return a;
     }
 
@@ -77,7 +85,7 @@ inline std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,
 inline std::optional<Predicate> pgu(Predicate P1,Predicate P2,Clause &C1,Clause &C2)
 {
     if(!Predicate::symbolically_same(P1,P2) ||P1.count_args()!=P2.count_args())
-        return {};
+        return std::nullopt;
     for(int i=0;i<P1.count_args();i++)
     {
         Literal L1=P1.get_args()[i],L2=P2.get_args()[i];
@@ -85,6 +93,13 @@ inline std::optional<Predicate> pgu(Predicate P1,Predicate P2,Clause &C1,Clause 
         if(!L.has_value()) return std::nullopt;
     }
     return P1;
+}
+
+inline bool unifiable(Predicate P1,Predicate P2)
+{
+
+    Clause C1({P1}),C2({P2});
+    return pgu(P1,P2,C1,C2).has_value();
 }
 
 

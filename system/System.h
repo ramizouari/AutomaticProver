@@ -16,12 +16,13 @@ class System
 {
     bool consistent=true;
     std::vector<Clause> S;
-    std::list<Clause> T;
+    std::unordered_set<Clause> T;
     bool prove(Clause C1,Clause C2,std::queue<Clause>&Q);
     int clause_count_limit=1e6;
     int clause_count;
+    VariableFactory &F;
 public:
-    System(const std::vector<Clause> &_S,VariableFactory F);
+    System(const std::vector<Clause> &_S,VariableFactory &F);
     void add_clause(Clause C);
     bool prove(Clause C1,Clause C2);
     void rename_all(VariableFactory F);

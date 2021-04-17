@@ -18,15 +18,18 @@ int main()
     *Z = factory.new_instance("Z"),*U=factory.new_instance("U"),
     *V=factory.new_instance("V");
     SymbolicConstant *e = new IdentifiedSymbolicConstant<std::string>("e");
+    SymbolicConstant *a = new IdentifiedSymbolicConstant<std::string>("a");
+    SymbolicConstant *b = new IdentifiedSymbolicConstant<std::string>("b");
     SymbolicFunction_1 *f = new IdentifiedSymbolicFunction_1<std::string>("f");
     SymbolicPredicate_2 *equal= new IdentifiedSymbolicPredicate_2<std::string>("equal");
     Clause equality_symmetric({~Predicate(equal,X,Y),Predicate(equal,Y,X)});
     Clause equality_transitive({~Predicate(equal,X,Y),~Predicate(equal,Y,Z),Predicate(equal,X,Z)});
-    Clause equality_reflexive({Predicate(equal,X,X)});
+    Clause equality_reflexive({~Predicate(equal,X,X)});
     Literal f_x(f,X);
-    Literal f4_e(f,Literal(f,X));
+    Literal f_a(f,a);
+    Literal f4_a(f,Literal(f,Literal(f,Literal(f,X))));
     Clause equality_existence({Predicate(equal,X,f_x)});
-    System S({equality_transitive,equality_existence,Clause({~Predicate(equal,Literal(f,X),f4_e)})},
+    System S({equality_transitive,equality_symmetric,equality_existence,equality_reflexive},
              factory);
     for(auto T:S.get_theorems())
         std::cout << T.get_name() << '\n';

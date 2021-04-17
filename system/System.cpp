@@ -30,12 +30,12 @@ bool System::prove(Clause C1, Clause C2)
             if(R.is_empty())
                 consistent=false;
             clause_count+=R.count_predicates();
-            T.emplace_back(R);
+            T.insert(R);
         }
     return proof;
 }
 
-System::System(const std::vector<Clause> &_S,VariableFactory F):S(_S)
+System::System(const std::vector<Clause> &_S,VariableFactory &_F):S(_S),F(_F)
 {
     rename_all(F);
 }
@@ -53,7 +53,7 @@ bool System::check_consistency() {
         if(clause_count>clause_count_limit)
             throw ProofLengthException();
         auto C = Q.front();
-        T.emplace_back(C);
+        T.insert(C);
         bool any_proof=false;
         for(auto U:T)
             prove(C,U,Q);
@@ -62,7 +62,7 @@ bool System::check_consistency() {
         Q.pop();
     }
     while(!Q.empty()) {
-        T.emplace_back(Q.front());
+        T.insert(Q.front());
         Q.pop();
     }
     return consistent;
@@ -71,26 +71,37 @@ bool System::check_consistency() {
 bool System::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
     bool proof=false;
     for(int i=0;i<C1.predicates.size();i++) for(int j=0;j<C2.predicates.size();j++)
-            if(auto P=pgu(C1.predicates[i],~C2.predicates[j],C1,C2);P.has_value())
-            {
-                proof=true;
+    {
+            Clause S1(C1),S2(C2);
+            if (auto P = pgu(S1.predicates[i], ~S2.predicates[j], S1, S2);P.has_value()) {
+                proof = true;
                 Clause R;
-                for(int s=0;s<C1.predicates.size();s++)
-                {
-                    if(s==i) continue;
-                    R.predicates.push_back(C1.predicates[s]);
+                for (int s = 0; s < S1.predicates.size(); s++) {
+                    if (s == i) continue;
+                    R.predicates.push_back(S1.predicates[s]);
                 }
-                for(int s=0;s<C2.predicates.size();s++)
-                {
-                    if(s==j) continue;
-                    R.predicates.push_back(C2.predicates[s]);
+                for (int s = 0; s < S2.predicates.size(); s++) {
+                    if (s == j) continue;
+                    R.predicates.push_back(S2.predicates[s]);
                 }
-                if(R.is_empty())
-                    consistent=false;
-                if(!std::none_of(T.begin(),T.end(),[&R](auto C){return C==R; }))
-                    Q.push(R);
+                if (R.is_empty())
+                    consistent = false;
+                if (!T.contains(R))
+                {
+                    bool is_true_statement=false;
+                    for(int i=0;i<R.predicates.size();i++) for(int j=i+1;j<R.predicates.size();j++)
+                        if(unifiable(R.predicates[i],R.predicates[j]))
+                        {
+                            is_true_statement=true;
+                            break;
+                        }
+                    if(!is_true_statement)
+                        Q.push(R);
+                }
+
 
             }
+        }
     return proof;
 }
 
