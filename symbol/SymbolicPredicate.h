@@ -20,6 +20,6 @@ class SymbolicPredicate_p: public SymbolicPredicate
 public:
     SymbolicPredicate_p(): SymbolicPredicate(p){}
 };
-using SymbolicProposition=SymbolicPredicate_p<0>;
+using SymbolicPreposition=SymbolicPredicate_p<0>;
 
 #endif //AUTOMATICPROVER_SYMBOLICPREDICATE_H

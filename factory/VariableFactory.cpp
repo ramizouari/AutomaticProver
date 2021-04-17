@@ -44,9 +44,10 @@ int VariableFactory::rename(Clause &C, int offset)
                 {
                     auto p=S_map[offset];
                     f[offset]=p;
-                    g[p]=offset;
+                    g[w.S]=offset;
                     offset++;
                     k++;
+                    w.S=p;
                 }
 
             }
