@@ -1,6 +1,7 @@
 #include <iostream>
 #include "system/System.h"
 #include "factory/VariableFactory.h"
+#include "factory/IdentifiedVariableFactory.h"
 #include "symbol/IdentifiedSymbol.h"
 
 /*
@@ -11,14 +12,14 @@
  * */
 
 int main() {
-    VariableFactory factory;
-    auto X=factory.new_instance();
-    SymbolicFunction *f = new IdentifiedSymbolicFunction<std::string>("f",1);
-    Symbol *h = new IdentifiedSymbolicFunction<std::string>("h",2);
-    Symbol *s = new IdentifiedSymbolicFunction<std::string>("s",1);
-    Symbol *a = new IdentifiedSymbolicConstant<std::string>("a");
-    Literal w1(f,{X}),w2(s,{w1});
-    Literal w(h, {w1,w2});
+    IdentifiedVariableFactory<std::string> factory;
+    auto X=factory.new_instance("X");
+    SymbolicFunction_1 *f = new IdentifiedSymbolicFunction_1<std::string>("f");
+    SymbolicFunction_2 *h = new IdentifiedSymbolicFunction_2<std::string>("h");
+    SymbolicFunction_1 *s = new IdentifiedSymbolicFunction_1<std::string>("s");
+    SymbolicConstant *a = new IdentifiedSymbolicConstant<std::string>("a");
+    Literal w1(f,X),w2(s,w1);
+    Literal w(h, X,w2);
     std::cout << w.get_name();
     return 0;
 }

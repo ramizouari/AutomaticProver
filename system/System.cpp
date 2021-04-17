@@ -13,7 +13,7 @@ bool System::prove(Clause C1, Clause C2)
 {
     bool proof=false;
     for(int i=0;i<C1.predicates.size();i++) for(int j=0;j<C2.predicates.size();j++)
-        if(Predicate P=pgu(C1.predicates[i],~C2.predicates[j],C1,C2);!P.is_empty())
+        if(auto P=pgu(C1.predicates[i],~C2.predicates[j],C1,C2);P.has_value())
         {
             proof=true;
             Clause R;
@@ -30,7 +30,7 @@ bool System::prove(Clause C1, Clause C2)
             if(R.is_empty())
                 consistent=false;
             clause_count+=R.count_predicates();
-            T.insert(R);
+            T.emplace_back(R);
         }
     return proof;
 }
@@ -53,21 +53,25 @@ bool System::check_consistency() {
         if(clause_count>clause_count_limit)
             throw ProofLengthException();
         auto C = Q.front();
-        T.insert(C);
+        T.emplace_back(C);
         bool any_proof=false;
         for(auto U:T)
             prove(C,U,Q);
         if(!consistent)
-            return false;
+            break;
         Q.pop();
     }
-    return true;
+    while(!Q.empty()) {
+        T.emplace_back(Q.front());
+        Q.pop();
+    }
+    return consistent;
 }
 
 bool System::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
     bool proof=false;
     for(int i=0;i<C1.predicates.size();i++) for(int j=0;j<C2.predicates.size();j++)
-            if(Predicate P=pgu(C1.predicates[i],~C2.predicates[j],C1,C2);!P.is_empty())
+            if(auto P=pgu(C1.predicates[i],~C2.predicates[j],C1,C2);P.has_value())
             {
                 proof=true;
                 Clause R;
@@ -83,7 +87,7 @@ bool System::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
                 }
                 if(R.is_empty())
                     consistent=false;
-                if(!T.contains(R))
+                if(!std::none_of(T.begin(),T.end(),[&R](auto C){return C==R; }))
                     Q.push(R);
 
             }
@@ -101,4 +105,11 @@ void System::rename_all(VariableFactory F)
     for(auto &C:S)
         n+=F.rename(C,n);
 
+}
+
+std::vector<Clause> System::get_theorems() {
+    check_consistency();
+    std::vector<Clause> T_;
+    std::copy(T.begin(),T.end(),std::back_inserter(T_));
+    return T_;
 }

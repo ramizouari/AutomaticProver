@@ -10,12 +10,13 @@
 #include "unordered_set"
 #include <queue>
 #include "../factory/VariableFactory.h"
+#include <list>
 
 class System
 {
     bool consistent=true;
     std::vector<Clause> S;
-    std::unordered_set<Clause> T;
+    std::list<Clause> T;
     bool prove(Clause C1,Clause C2,std::queue<Clause>&Q);
     int clause_count_limit=1e6;
     int clause_count;
@@ -26,6 +27,8 @@ public:
     void rename_all(VariableFactory F);
     bool check_consistency();
     bool is_consistent() const;
+    bool is_theorem(Clause C) const;
+    std::vector<Clause> get_theorems() ;
 };
 
 

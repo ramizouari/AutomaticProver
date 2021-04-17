@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 class VariableFactory {
+protected:
     inline static std::unordered_map<int,Variable*> S_map;
     inline static std::unordered_map<Variable*,int> id_map;
     inline static int counter=0;

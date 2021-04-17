@@ -22,14 +22,6 @@ bool Literal::contains(Symbol *s) const{
     return false;
 }
 
-Literal::Literal(): S(nullptr){
-
-}
-
-bool Literal::is_empty() const {
-    return !S;
-}
-
 void Literal::rename(Symbol *x, Symbol *y) {
     if(S==x) S=y;
     else for(auto &L:args) L.rename(x,y);
@@ -52,7 +44,12 @@ bool Literal::contains(const Literal &s) const {
 }
 
 void Literal::rename(const Literal &x,const Literal& y) {
-    rename(x.S,y.S);
+    if(S==x.S)
+    {
+        S = y.S;
+        args=y.args;
+    }
+    else for(auto &L:args) L.rename(x,y);
 }
 
 int Literal::count_variables() const {
@@ -63,10 +60,10 @@ int Literal::count_variables() const {
     while(!Q.empty())
     {
         auto w = Q.top();
-        if(!w.is_empty() && w.S->is_variable())
+        if(w.S->is_variable())
             v_set.insert(dynamic_cast<Variable*>(w.S));
         Q.pop();
-        for(const auto &u:args)
+        for(const auto &u:w.args)
             Q.push(u);
 
     }
@@ -89,15 +86,5 @@ Symbol* Literal::get() {
     return S;
 }
 
-template<typename T>
-Literal::Literal(SymbolicFunction_p<1> *c,T k):S(c),args(1,k) {
 
-}
-
-template<typename T1, typename T2>
-Literal::Literal(SymbolicFunction_p<2> *c, T1 K1, T2 K2):S(c)
-{
-    args.emplace_back(K1);
-    args.emplace_back(K2);
-}
 

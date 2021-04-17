@@ -4,10 +4,10 @@
 
 #ifndef AUTOMATICPROVER_PREDICATE_H
 #define AUTOMATICPROVER_PREDICATE_H
-#include "../symbol/Literal.h"
-#include "../symbol/SymbolicPredicate.h"
+#include "symbol/Literal.h"
+#include "symbol/SymbolicPredicate.h"
 
-class Predicate {
+class Predicate : virtual public Identifiable<std::string>{
     SymbolicPredicate *P;
     std::vector<Literal> args;
     bool negated;
@@ -27,6 +27,11 @@ public:
         args.emplace_back(k);
     }
 
+    template<typename T1,typename T2>
+    Predicate(SymbolicPredicate_2 *_P,T1 U,T2 V,bool _negated=false):P(_P),negated(_negated) {
+        args.emplace_back(U);
+        args.template emplace_back(V);
+    }
     Predicate();
     const std::vector<Literal> get_args() const;
     Predicate operator~() const;
@@ -35,6 +40,23 @@ public:
     void rename(Symbol *x,Symbol *y);
     void rename(Literal a,Literal b);
     int count_variables() const;
+    std::string get_name() override
+    {
+        std::string R;
+        if(negated) R+="~";
+        R+=dynamic_cast<IdentifiableSymbol<std::string>*>(P)->get_name();
+        int n=args.size();
+        if(n>0)
+        {
+            R += '(';
+            for (int i = 0; i < n - 1; i++)
+                R += args[i].get_name() + ", ";
+
+            R+= args.back().get_name();
+            R+=')';
+        }
+        return R;
+    }
 };
 
 

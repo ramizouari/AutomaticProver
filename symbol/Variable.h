@@ -5,10 +5,10 @@
 #ifndef AUTOMATICPROVER_VARIABLE_H
 #define AUTOMATICPROVER_VARIABLE_H
 #include "Symbol.h"
-#include "IdentifiedSymbol.h"
+#include "IdentifiableSymbol.h"
 #include <sstream>
 
-class Variable : public IdentifiableSymbol<std::string>{
+class Variable :virtual  public IdentifiableSymbol<std::string>{
 
     int id;
     inline static int counter=0;

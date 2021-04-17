@@ -7,7 +7,7 @@
 #include <vector>
 #include "Predicate.h"
 
-class Clause {
+class Clause : virtual public Identifiable<std::string>{
     std::vector<Predicate> predicates;
     friend class System;
     friend class std::hash<Clause>;
@@ -21,15 +21,26 @@ public:
     bool is_empty() const;
     void rename(Symbol *x,Symbol *y);
     void rename(Literal a,Literal b);
-
+    std::string get_name() override
+    {
+        std::string R;
+        int n=predicates.size();
+        if(n>0)
+        {
+            for(int i=0;i<n-1;i++)
+                R+=predicates[i].get_name()+"|";
+            R+=predicates.back().get_name();
+        }
+        return R;
+    }
 };
 
-inline Literal pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Clause &D)
+inline std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Clause &D)
 {
     if(a==b)
         return a;
     else if(!a.is_variable() && !b.is_variable())
-        return {};
+        return std::nullopt;
     else if(a.is_variable() && b.is_variable())
     {
         auto p = dynamic_cast<Variable*>(a.get()),q=dynamic_cast<Variable*>(b.get());
@@ -48,14 +59,14 @@ inline Literal pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Claus
     }
     else if(a.is_variable())
     {
-        if(b.contains(a))  return {};
+        if(b.contains(a))  return std::nullopt;
         C.rename(a,b);
         D.rename(a,b);
         return b;
     }
     else if(b.is_variable())
     {
-        if(a.contains(b)) return {};
+        if(a.contains(b)) return std::nullopt;
         C.rename(b,a);
         D.rename(b,a);
         return a;
@@ -63,15 +74,15 @@ inline Literal pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Claus
 
 }
 
-inline Predicate pgu(Predicate P1,Predicate P2,Clause &C1,Clause &C2)
+inline std::optional<Predicate> pgu(Predicate P1,Predicate P2,Clause &C1,Clause &C2)
 {
     if(!Predicate::symbolically_same(P1,P2) ||P1.count_args()!=P2.count_args())
         return {};
     for(int i=0;i<P1.count_args();i++)
     {
         Literal L1=P1.get_args()[i],L2=P2.get_args()[i];
-        Literal L= pgu(L1,L2,P1,P2,C1,C2);
-        if(L.is_empty()) return {};
+        auto L= pgu(L1,L2,P1,P2,C1,C2);
+        if(!L.has_value()) return std::nullopt;
     }
     return P1;
 }
