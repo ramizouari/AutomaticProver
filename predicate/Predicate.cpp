@@ -4,7 +4,7 @@
 
 #include "Predicate.h"
 #include <stdexcept>
-
+#include "Clause.h"
 Predicate::Predicate(SymbolicPredicate *_P,const std::vector<Literal>&_args, bool _negated) :
 P(_P),negated(_negated),args(_args)
 {
@@ -73,4 +73,13 @@ Predicate::Predicate() :P(nullptr){
 
 Predicate::Predicate(SymbolicPreposition *_P, bool _negated):P(_P),negated(_negated) {
 
+}
+
+Clause Predicate::operator|(Clause c)  const{
+    return c|*this;
+}
+
+
+Clause Predicate::operator|(Predicate c)  const{
+    return Clause({c,*this});
 }

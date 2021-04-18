@@ -90,7 +90,7 @@ bool System::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
                 {
                     bool is_true_statement=false;
                     for(int i=0;i<R.predicates.size();i++) for(int j=i+1;j<R.predicates.size();j++)
-                        if(unifiable(R.predicates[i],R.predicates[j]))
+                        if(unifiable(R.predicates[i],~R.predicates[j]))
                         {
                             is_true_statement=true;
                             break;

@@ -3,6 +3,7 @@
 //
 
 #include "SymbolicFunction.h"
+#include "Literal.h"
 
 int SymbolicFunction::arg_count() {
     return n;

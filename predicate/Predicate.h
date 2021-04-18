@@ -5,7 +5,30 @@
 #ifndef AUTOMATICPROVER_PREDICATE_H
 #define AUTOMATICPROVER_PREDICATE_H
 #include "symbol/Literal.h"
-#include "symbol/SymbolicPredicate.h"
+class Clause;
+class Predicate;
+class SymbolicPredicate :virtual public Symbol{
+    const int n;
+public:
+    SymbolicPredicate(int _n);
+    virtual int arg_count() override;
+    virtual bool is_variable() override;
+    template<typename ...T>
+    Predicate operator()(T ... s) const;
+};
+
+template<int p>
+class SymbolicPredicate_p: public SymbolicPredicate
+{
+public:
+    SymbolicPredicate_p(): SymbolicPredicate(p){}
+    template<typename ...T>
+    Predicate operator()(T ... s) const;
+};
+using SymbolicPreposition=SymbolicPredicate_p<0>;
+using SymbolicPredicate_1=SymbolicPredicate_p<1>;
+using SymbolicPredicate_2=SymbolicPredicate_p<2>;
+using SymbolicPredicate_3=SymbolicPredicate_p<3>;
 
 class Predicate : virtual public Identifiable<std::string>{
     SymbolicPredicate *P;
@@ -22,16 +45,11 @@ public:
     Predicate(SymbolicPredicate *_P,const std::vector<Literal> &_args={},bool _negated=false);
     Predicate(SymbolicPreposition *_P,bool _negated=false);
 
-    template<typename T>
-    Predicate(SymbolicPredicate_1 *_P,T k,bool _negated=false):P(_P),negated(_negated) {
-        args.emplace_back(k);
+    template<typename ...T>
+    Predicate(SymbolicPredicate_p<sizeof...(T)>*c,T ...K):P(c),args{K...},negated(false)
+    {
     }
 
-    template<typename T1,typename T2>
-    Predicate(SymbolicPredicate_2 *_P,T1 U,T2 V,bool _negated=false):P(_P),negated(_negated) {
-        args.emplace_back(U);
-        args.template emplace_back(V);
-    }
     Predicate();
     const std::vector<Literal> get_args() const;
     Predicate operator~() const;
@@ -40,6 +58,8 @@ public:
     void rename(Symbol *x,Symbol *y);
     void rename(Literal a,Literal b);
     int count_variables() const;
+    Clause operator|(Predicate C) const;
+    Clause operator|(Clause c) const;
     std::string get_name() override
     {
         std::string R;
@@ -73,5 +93,18 @@ struct std::hash<Predicate>
         return H_S(s.P)+h;
     }
 };
+
+template<typename ...T>
+inline Predicate SymbolicPredicate::operator()(T ... s) const
+{
+    std::vector<Literal> args{s...};
+    return Predicate(const_cast<SymbolicPredicate*>(this),args);
+}
+
+template<int p> template<typename ...T>
+inline Predicate SymbolicPredicate_p<p>::operator()(T ... s) const
+{
+    return Predicate(const_cast<SymbolicPredicate_p<p>*>(this),s...);
+}
 
 #endif //AUTOMATICPROVER_PREDICATE_H

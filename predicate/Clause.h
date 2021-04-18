@@ -16,6 +16,9 @@ public:
     bool operator!=(Clause C) const;
     bool operator==(Clause C) const;
     Clause(const std::vector<Predicate> &P={});
+    Clause(Predicate P);
+    Clause operator|(Clause a) const;
+    Clause operator|(Predicate a) const;
     int count_variables() const;
     int count_predicates() const;
     bool is_empty() const;

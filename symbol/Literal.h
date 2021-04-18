@@ -9,8 +9,37 @@
 #include <vector>
 #include <random>
 #include <variant>
-#include "IdentifiedSymbol.h"
 #include <optional>
+#include <initializer_list>
+
+class Literal;
+
+class SymbolicFunction : virtual public Symbol
+{
+    const int n;
+public:
+    SymbolicFunction(int _n);
+    virtual int arg_count() override;
+    virtual bool is_variable() override;
+    template<typename ...T>
+    Literal operator()(T ... s) const;
+};
+
+template<int p>
+class SymbolicFunction_p: public SymbolicFunction
+{
+public:
+    SymbolicFunction_p(): SymbolicFunction(p){}
+    template<typename ...T>
+    Literal operator()(T ... s) const;
+};
+using SymbolicConstant=SymbolicFunction_p<0>;
+using SymbolicFunction_1=SymbolicFunction_p<1>;
+using SymbolicFunction_2=SymbolicFunction_p<2>;
+using SymbolicFunction_3=SymbolicFunction_p<3>;
+using SymbolicFunction_4=SymbolicFunction_p<4>;
+using SymbolicFunction_5=SymbolicFunction_p<5>;
+
 
 class Literal : virtual public Identifiable<std::string> {
 protected:
@@ -21,17 +50,12 @@ protected:
 public:
     Literal(Variable *v);
     Literal(Symbol *f,const std::vector<Literal> &_args={});
-    template<typename T>
-    Literal(SymbolicFunction_p<1>*c,T K):S(c),args(1,K) {
 
+    template<typename ...T>
+    Literal(SymbolicFunction_p<sizeof...(T)>*c,T ...K):S(c),args{Literal(K)...}
+    {
     }
-    template<typename T1,typename T2>
-    Literal(SymbolicFunction_p<2>*c,T1 K1,T2 K2):S(c)
-            {
-                    args.emplace_back(K1);
-            args.emplace_back(K2);
-            }
-    Literal(SymbolicConstant *c);
+
     bool operator!=(Literal L) const;
     bool operator==(Literal L) const;
     bool contains(Symbol *s) const;
@@ -74,4 +98,17 @@ struct std::hash<Literal>
         return h+H(s.S);
     }
 };
+
+template<typename ...T>
+inline Literal SymbolicFunction::operator()(T ... s) const
+{
+    std::vector<Literal> args{Literal(s)...};
+    return Literal(this,args);
+}
+
+template<int p> template<typename ...T>
+inline Literal SymbolicFunction_p<p>::operator()(T ... s) const
+{
+    return Literal(const_cast<SymbolicFunction_p<p>*>(this),Literal(s)...);
+}
 #endif //AUTOMATICPROVER_LITERAL_H

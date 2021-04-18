@@ -39,3 +39,20 @@ void Clause::rename(Literal x, Literal y) {
 int Clause::count_predicates() const {
     return predicates.size();
 }
+
+Clause Clause::operator|(Predicate c)const {
+    Clause S(*this);
+    S.predicates.push_back(c);
+    return S;
+}
+
+Clause Clause::operator|(Clause c)const {
+    Clause S(*this);
+    for(int i=0;i<c.count_predicates();i++)
+        S.predicates.push_back(c.predicates[i]);
+    return S;
+}
+
+Clause::Clause(Predicate P):predicates{P} {
+
+}

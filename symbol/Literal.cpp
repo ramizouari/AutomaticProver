@@ -78,13 +78,11 @@ bool Literal::operator!=(Literal L)const {
     return S!=L.S || args!=L.args;
 }
 
-Literal::Literal(SymbolicConstant *f):Literal(f,{}) {
-
-}
 
 Symbol* Literal::get() {
     return S;
 }
+
 
 
 
