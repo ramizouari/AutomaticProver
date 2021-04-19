@@ -3,8 +3,8 @@
 //
 
 #include "System.h"
-#include "../predicate/Predicate.h"
-#include "../exception/ProofLengthException.h"
+#include "predicate/Predicate.h"
+#include "exception/ProofLengthException.h"
 #include <stack>
 #include <queue>
 #include <unordered_set>
@@ -37,7 +37,7 @@ bool System::prove(Clause C1, Clause C2)
 
 System::System(const std::vector<Clause> &_S,VariableFactory &_F):S(_S),F(_F)
 {
-    rename_all(F);
+    rename_all();
 }
 
 bool System::is_consistent() const {
@@ -96,7 +96,10 @@ bool System::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
                             break;
                         }
                     if(!is_true_statement)
+                    {
+                        clause_count+=R.count_predicates();
                         Q.push(R);
+                    }
                 }
 
 
@@ -110,7 +113,7 @@ void System::add_clause(Clause C)
     S.push_back(C);
 }
 
-void System::rename_all(VariableFactory F)
+void System::rename_all()
 {
     int n=0;
     for(auto &C:S)
@@ -123,4 +126,68 @@ std::vector<Clause> System::get_theorems() {
     std::vector<Clause> T_;
     std::copy(T.begin(),T.end(),std::back_inserter(T_));
     return T_;
+}
+
+System System::operator&(System S)  const
+{
+    System A(*this);
+    std::copy(S.S.begin(),S.S.end(),std::back_inserter(A.S));
+    A.rename_all();
+    return A;
+}
+
+System System::operator&(Clause S)  const
+{
+    System A(*this);
+    A.add_clause(S);
+    A.rename_all();
+    return A;
+}
+
+System System::operator&(Predicate S)  const
+{
+    System A(*this);
+    A.add_clause(S);
+    A.rename_all();
+    return A;
+}
+
+System::System(VariableFactory &_F) :F(_F){
+
+}
+
+void System::merge(System S1) {
+    std::copy(S1.S.begin(),S1.S.end(),std::back_inserter(S));
+    rename_all();
+}
+
+System &System::operator&=(System S) {
+    merge(S);
+    return *this;
+}
+
+System &System::operator&=(Clause C) {
+    merge(C);
+    return *this;
+}
+
+System &System::operator&=(Predicate C) {
+    merge(C);
+    return *this;
+}
+
+void System::merge(Clause C)
+{
+    add_clause(C);
+    rename_all();
+}
+
+void System::merge(Predicate P)
+{
+    add_clause(Clause(P));
+    rename_all();
+}
+
+void System::set_limit(int L) {
+    clause_count_limit=L;
 }

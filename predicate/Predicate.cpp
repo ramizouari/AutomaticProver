@@ -83,3 +83,20 @@ Clause Predicate::operator|(Clause c)  const{
 Clause Predicate::operator|(Predicate c)  const{
     return Clause({c,*this});
 }
+
+std::string Predicate::get_name()  {
+    std::string R;
+    if(negated) R+="~";
+    R+=dynamic_cast<IdentifiableSymbol<std::string>*>(P)->get_name();
+    int n=args.size();
+    if(n>0)
+    {
+        R += '(';
+        for (int i = 0; i < n - 1; i++)
+            R += args[i].get_name() + ", ";
+
+        R+= args.back().get_name();
+        R+=')';
+    }
+    return R;
+}

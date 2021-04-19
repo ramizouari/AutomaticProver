@@ -9,11 +9,8 @@ void VariableFactory::resize(int s)
 {
     int n=S_map.size();
     for(int i=n;i<s;i++)
-    {
-        Variable *w=new Variable;
-        S_map[i]=w;
-        id_map[w]=i;
-    }
+        Variable *w=new_instance();
+
     for(int i=n-1;i>=s;i--)
     {
         id_map.erase(S_map[i]);
@@ -25,7 +22,7 @@ void VariableFactory::resize(int s)
 int VariableFactory::rename(Clause &C, int offset)
 {
 
-    resize(std::max<int>(S_map.size(),offset+C.count_variables()));
+    //resize(std::max<int>(S_map.size(),offset+C.count_variables()));
     std::unordered_map<int,Symbol*> f;
     std::unordered_map<Symbol*,int> g;
     std::queue<Literal*> Q;
@@ -42,6 +39,8 @@ int VariableFactory::rename(Clause &C, int offset)
                     w.S=f[g[w.S]];
                 else
                 {
+                    if(offset>=S_map.size())
+                        new_instance();
                     auto p=S_map[offset];
                     f[offset]=p;
                     g[w.S]=offset;

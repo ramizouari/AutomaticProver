@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 #include <system/System.h>
-
+#include "system/Group.h"
 
 int main()
 {
@@ -18,33 +18,30 @@ int main()
     *Z = factory.new_instance("Z"),*U=factory.new_instance("U"),
     *V=factory.new_instance("V"),*W=factory.new_instance("W"),
     *T=factory.new_instance("T"),*Q=factory.new_instance("Q");
-    SymbolicConstant *e = new IdentifiedSymbolicConstant<std::string>("e");
     SymbolicConstant *a = new IdentifiedSymbolicConstant<std::string>("a");
     SymbolicConstant *b = new IdentifiedSymbolicConstant<std::string>("b");
+    SymbolicConstant *e1 = new IdentifiedSymbolicConstant<std::string>("e1");
+    SymbolicConstant *e2 = new IdentifiedSymbolicConstant<std::string>("e2");
     SymbolicFunction_2 &product = *new IdentifiedSymbolicFunction_2<std::string>("product");
-    SymbolicFunction_1  &inverse=*new IdentifiedSymbolicFunction_1<std::string>("inverse");
-    SymbolicPredicate_2 &equal= *new IdentifiedSymbolicPredicate_2<std::string>("equal");
-    SymbolicFunction_1 &f=*new IdentifiedSymbolicFunction_1<std::string>("f");
-    Clause equality_symmetric({~equal(X,Y),equal(Y,X)});
-    Clause equality_transitive({~equal(X,Y),~equal(Y,Z),equal(X,Z)});
-    Clause equality_reflexive({equal(X,X)});
-    Clause equality_existence({equal(X,f(X))});
-    Clause associativity({
-                         equal(product(product(X,Y),Z),product(X,product(Y,Z)))});
-    Clause commutativity({equal(product(X,Y),product(Y,X))});
-    Clause equality_preservation({~equal(X,Y),~equal(Z,U),
-                                  equal(product(X,Z),product(Z,U))});
-    Clause not_right_neutral({~equal(product(e,a),a)});
-    Clause left_neutral({equal(product(X,e),X)});
-    Clause right_inverse({equal(product(X,inverse(X)),e)});
-    Clause left_inverse({equal(product(inverse(X),X),e)});
-    Clause is_identity({equal(product(a,a),a)});
-    Clause absurd({~equal(a,e)});
-    Predicate consequence(~equal(product(product(a,a),product(b,b)),
-                          product(product(a,b),product(a,b))));
-    System S({equality_symmetric,equality_preservation,associativity,commutativity,
-              left_inverse,right_inverse,is_identity,absurd},
-             factory);
+    SymbolicFunction_1 &inverse1 = *new IdentifiedSymbolicFunction_1<std::string>("inverse1");
+    SymbolicFunction_1 &inverse2 = *new IdentifiedSymbolicFunction_1<std::string>("inverse2");
+
+    SystemWithEquality S(factory);
+    auto &equal=S.get_equality_symbol();
+    S.set_limit(2e6);
+    S.add_clause(equal(product(X,e1),X));
+    S.add_clause(equal(product(e1,X),X));
+    S.add_clause(~equal(X,U)|~equal(Y,V)|equal(product(X,Y),product(U,V)));
+    S.add_clause(equal(product(X,product(Y,Z)),product(product(X,Y),Z)));
+    S.add_clause(equal(product(X,Y),product(Y,X)));
+    //S.add_clause(~equal(product(X,Y),U)|~equal(product(Y,Z),V)|equal(product(U,Z),product(X,V)));
+    S.add_clause(equal(product(X,inverse1(X)),e1));
+    S.add_clause(equal(product(inverse1(X),X),e1));
+    S.add_clause(~equal(X,Y)|equal(inverse1(X),inverse1(Y)));
+    //S.add_clause(~equal(X,Y)|equal(inverse2(X),inverse2(Y)));
+
+    S.add_clause(~equal(inverse1(inverse1(e1)),e1));
+    S.rename_all();
     for(auto T:S.get_theorems())
         std::cout << T.get_name() << '\n';
     std::cout << S.check_consistency();

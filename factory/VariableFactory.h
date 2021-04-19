@@ -13,7 +13,7 @@ protected:
     inline static std::unordered_map<int,Variable*> S_map;
     inline static std::unordered_map<Variable*,int> id_map;
     inline static int counter=0;
-    void resize(int s);
+    virtual void resize(int s);
 public:
     VariableFactory();
     VariableFactory(VariableFactory &);
@@ -21,7 +21,7 @@ public:
     ~VariableFactory();
     Variable* by_id(int id) const;
     int id_of(Variable *S);
-    Variable* new_instance();
+    virtual Variable* new_instance();
     int rename(Literal &L,int offset);
     int rename(Clause &C,int offset);
 };
