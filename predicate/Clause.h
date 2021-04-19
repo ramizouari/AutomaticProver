@@ -25,6 +25,7 @@ public:
     void rename(Symbol *x,Symbol *y);
     void rename(Literal a,Literal b);
     std::string get_name() override;
+    Variable* find_first_variable() const;
 };
 
 std::optional<Literal> pgu(Literal a,Literal b,Predicate &E,Predicate &F,Clause &C,Clause &D);

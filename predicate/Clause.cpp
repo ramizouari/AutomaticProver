@@ -4,10 +4,24 @@
 
 #include "Clause.h"
 #include "system/System.h"
+#include <stack>
 int Clause::count_variables() const {
     int R=0;
-    for(const auto &P:predicates) R=std::max(R,P.count_variables());
-    return R;
+    std::stack<Literal> Q;
+    for(auto p:predicates) for(auto L:p.get_args())
+        Q.push(L);
+    std::unordered_set<Variable*> v_set;
+    while(!Q.empty())
+    {
+        auto w = Q.top();
+        if(w.get()->is_variable())
+            v_set.insert(dynamic_cast<Variable*>(w.get()));
+        Q.pop();
+        for(const auto &u:w.get_args())
+            Q.push(u);
+
+    }
+    return v_set.size();
 }
 
 bool Clause::is_empty() const {
@@ -68,6 +82,12 @@ std::string Clause::get_name()
         R+=predicates.back().get_name();
     }
     return R;
+}
+
+Variable *Clause::find_first_variable() const {
+    for(auto P:predicates) if(auto V=P.find_first_variable())
+        return V;
+    return nullptr;
 }
 
 
