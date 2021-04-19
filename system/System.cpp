@@ -191,3 +191,28 @@ void System::merge(Predicate P)
 void System::set_limit(int L) {
     clause_count_limit=L;
 }
+
+std::vector<Clause> System::get_hypotheseses()const  {
+    return S;
+}
+
+std::vector<SymbolicFunction*> System::get_functions() const {
+    std::unordered_set<SymbolicFunction*> F;
+    std::queue<Literal> Q;
+    for(auto C:S) for(auto P:C.predicates) for(auto u:P.get_args())
+    {
+        Q.push(u);
+        while(!Q.empty())
+        {
+            auto w=Q.front();
+            if(!w.is_variable())
+                Q.push(dynamic_cast<SymbolicFunction*>(w.get()));
+            for(auto v:w.get_args())
+                Q.push(v);
+            Q.pop();
+        }
+    }
+    std::vector<SymbolicFunction*> R;
+    std::copy(F.begin(),F.end(),std::back_inserter(R));
+    return R;
+}

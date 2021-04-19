@@ -41,7 +41,9 @@ public:
     System& operator&=(Predicate P);
     System operator&(Clause C) const;
     System operator&(Predicate P) const;
+    std::vector<Clause> get_hypotheseses() const;
     std::vector<Clause> get_theorems() ;
+    std::vector<SymbolicFunction*> get_functions() const;
 };
 
 
