@@ -100,3 +100,9 @@ std::string Predicate::get_name()  {
     }
     return R;
 }
+
+Variable *Predicate::find_first_variable() const {
+    for(auto L:args) if(auto V=L.find_first_variable())
+        return V;
+    return nullptr;
+}

@@ -14,7 +14,7 @@ public:
     virtual int arg_count() override;
     virtual bool is_variable() override;
     template<typename ...T>
-    Predicate operator()(T ... s) const;
+    Predicate operator()(T ... s) const ;
 };
 
 template<int p>
@@ -23,7 +23,7 @@ class SymbolicPredicate_p: public SymbolicPredicate
 public:
     SymbolicPredicate_p(): SymbolicPredicate(p){}
     template<typename ...T>
-    Predicate operator()(T ... s) const;
+    Predicate operator()(T ... s) const requires (sizeof...(T)==p);
 };
 using SymbolicPreposition=SymbolicPredicate_p<0>;
 using SymbolicPredicate_1=SymbolicPredicate_p<1>;
@@ -61,6 +61,7 @@ public:
     Clause operator|(Predicate C) const;
     Clause operator|(Clause c) const;
     std::string get_name() override;
+    Variable* find_first_variable() const;
 };
 
 
@@ -86,7 +87,7 @@ inline Predicate SymbolicPredicate::operator()(T ... s) const
 }
 
 template<int p> template<typename ...T>
-inline Predicate SymbolicPredicate_p<p>::operator()(T ... s) const
+inline Predicate SymbolicPredicate_p<p>::operator()(T ... s) const requires (sizeof...(T)==p)
 {
     return Predicate(const_cast<SymbolicPredicate_p<p>*>(this),s...);
 }

@@ -83,6 +83,35 @@ Symbol* Literal::get() {
     return S;
 }
 
+std::vector<Literal> Literal::get_args()
+{
+    return args;
+}
+
+std::string Literal::get_name() {
+    if(!S)
+        return "??";
+    std::string R=dynamic_cast<IdentifiableSymbol<std::string>*>(S)->get_name();
+    int n=args.size();
+    if(n>0)
+    {
+        R += '(';
+        for (int i = 0; i < n - 1; i++)
+            R += args[i].get_name() + ", ";
+
+        R+= args.back().get_name();
+        R+=')';
+    }
+    return R;
+}
+
+Variable *Literal::find_first_variable() {
+    if(S->is_variable())
+        return dynamic_cast<Variable*>(S);
+    else for(auto u:args) if(auto V=u.find_first_variable())
+        return V;
+    return nullptr;
+}
 
 
 

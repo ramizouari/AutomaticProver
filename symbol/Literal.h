@@ -31,7 +31,7 @@ class SymbolicFunction_p: public SymbolicFunction
 public:
     SymbolicFunction_p(): SymbolicFunction(p){}
     template<typename ...T>
-    Literal operator()(T ... s) const;
+    Literal operator()(T ... s) const requires (sizeof...(T)==p);
 };
 using SymbolicConstant=SymbolicFunction_p<0>;
 using SymbolicFunction_1=SymbolicFunction_p<1>;
@@ -65,26 +65,11 @@ public:
     bool operator==(const Literal &c);
     bool operator!=(const Literal &c);
     bool is_variable() const;
+    std::vector<Literal> get_args();
     Symbol* get();
     int count_variables() const;
-
-    std::string get_name() override
-    {
-        if(!S)
-            return "??";
-        std::string R=dynamic_cast<IdentifiableSymbol<std::string>*>(S)->get_name();
-        int n=args.size();
-        if(n>0)
-        {
-            R += '(';
-            for (int i = 0; i < n - 1; i++)
-                R += args[i].get_name() + ", ";
-
-            R+= args.back().get_name();
-            R+=')';
-        }
-        return R;
-    }
+    std::string get_name() override;
+    Variable* find_first_variable();
 };
 
 template<>
@@ -107,7 +92,7 @@ inline Literal SymbolicFunction::operator()(T ... s) const
 }
 
 template<int p> template<typename ...T>
-inline Literal SymbolicFunction_p<p>::operator()(T ... s) const
+inline Literal SymbolicFunction_p<p>::operator()(T ... s) const requires (sizeof...(T)==p)
 {
     return Literal(const_cast<SymbolicFunction_p<p>*>(this),Literal(s)...);
 }
