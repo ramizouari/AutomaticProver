@@ -4,7 +4,7 @@
 
 #ifndef AUTOMATICPROVER_RING_H
 #define AUTOMATICPROVER_RING_H
-#include "CommutativeGroup.h"
+#include "system/algebraic/CommutativeGroup.h"
 
 class Ring :public CommutativeGroup{
 protected:

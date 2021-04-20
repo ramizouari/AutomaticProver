@@ -9,7 +9,9 @@
 #include <string>
 #include <iostream>
 #include <system/PredicateSystem.h>
-#include "system/Group.h"
+#include "system/algebraic/Group.h"
+#include "system/algebraic/MedianAlgebra.h"
+#include "prover/HerbrandProver.h"
 
 int main()
 {
@@ -20,28 +22,21 @@ int main()
     *T=factory.new_instance("T"),*Q=factory.new_instance("Q");
     SymbolicConstant *a = new IdentifiedSymbolicConstant<std::string>("a");
     SymbolicConstant *b = new IdentifiedSymbolicConstant<std::string>("b");
-    SymbolicConstant *e1 = new IdentifiedSymbolicConstant<std::string>("e1");
-    SymbolicConstant *e2 = new IdentifiedSymbolicConstant<std::string>("e2");
-    SymbolicFunction_2 &product = *new IdentifiedSymbolicFunction_2<std::string>("group_op");
-    SymbolicFunction_1 &inverse1 = *new IdentifiedSymbolicFunction_1<std::string>("inverse1");
-    SymbolicFunction_1 &inverse2 = *new IdentifiedSymbolicFunction_1<std::string>("inverse2");
+    SymbolicConstant *c = new IdentifiedSymbolicConstant<std::string>("c");
 
-    SystemWithEquality S(factory);
+    Group S(factory);
+    S.set_limit(4e6);
     auto &equal=S.get_equality_symbol();
-    S.set_limit(2e6);
-    S.add_clause(equal(product(X,e1),X));
-    S.add_clause(equal(product(e1,X),X));
-    S.add_clause(~equal(X,U)|~equal(Y,V)|equal(product(X,Y),product(U,V)));
-    S.add_clause(equal(product(X,product(Y,Z)),product(product(X,Y),Z)));
-    S.add_clause(equal(product(X,Y),product(Y,X)));
-    //S.add_clause(~equal(group_op(X,Y),U)|~equal(group_op(Y,Z),V)|equal(group_op(U,Z),group_op(X,V)));
-    S.add_clause(equal(product(X,inverse1(X)),e1));
-    S.add_clause(equal(product(inverse1(X),X),e1));
-    S.add_clause(~equal(X,Y)|equal(inverse1(X),inverse1(Y)));
-    //S.add_clause(~equal(X,Y)|equal(inverse2(X),inverse2(Y)));
+    auto &inverse=S.get_inverse();
+    auto &product=S.get_product();
+    auto e=S.get_neutral_element();
+    S.add_clause(equal(X,e)|equal(Y,a));
+    S.add_clause(~equal(a,e));
+    S.add_goal(equal(inverse(a),e));
+    // S.add_goal(~equal(inverse(inverse(e)),e));
 
-    S.add_clause(~equal(inverse1(inverse1(e1)),e1));
     S.rename_all();
+    HerbrandProver H;
     for(auto T:S.get_theorems())
         std::cout << T.get_name() << '\n';
     std::cout << S.check_consistency();

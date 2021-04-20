@@ -9,6 +9,7 @@
 class System {
 protected:
     std::vector<Clause> S;
+    std::vector<Clause> G;
     System();
 public:
     System(const std::vector<Clause> &_S);
@@ -17,6 +18,7 @@ public:
     std::vector<Clause> get_hypotheseses() const;
     virtual std::vector<Clause> get_theorems()=0 ;
     void add_clause(Clause C);
+    void add_goal(Clause C);
 
 };
 

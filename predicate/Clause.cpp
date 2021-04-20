@@ -96,7 +96,22 @@ std::optional<Literal> pgu(Literal a, Literal b, Predicate &E, Predicate &F, Cla
     if(a==b)
         return a;
     else if(!a.is_variable() && !b.is_variable())
-        return std::nullopt;
+    {
+        if(a.get()==b.get())
+        {
+            int n=a.get_args().size();
+            std::vector<Literal> args;
+            for(int i=0;i<n;i++)
+            {
+                auto S=pgu(a.get_args()[i],b.get_args()[i],E,F,C,D);
+                if(!S.has_value())
+                    return std::nullopt;
+                args.push_back(S.value());
+            }
+            return Literal(a.get(),args);
+        }
+        else return std::nullopt;
+    }
     else if(a.is_variable() && b.is_variable())
     {
         auto p = dynamic_cast<Variable*>(a.get()),q=dynamic_cast<Variable*>(b.get());

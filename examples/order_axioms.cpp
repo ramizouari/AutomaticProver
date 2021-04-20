@@ -29,10 +29,14 @@ int main()
     auto& equal=S.get_equality_symbol();
     auto X=factory.new_instance("X"),Y=factory.new_instance("Y"),Z=factory.new_instance("Z");
     S.set_limit(4e6);
+    S.add_clause(~equal(X,Y)|equal(f(X),f(Y)));
     S.add_clause(less_eq(X,e));
-    S.add_clause(less_eq(e,f(f(X))));
-    S.add_clause(~equal(e,f(f(X))));
+    S.add_clause(less_eq(e,f(f(f(X)))));
+    S.add_clause(equal(f(f(X)),f(X)));
+    S.add_goal(~equal(e,f(X)));
     HerbrandProver H_prover;
     S.rename_all();
-    std::cout << S.check_consistency(H_prover);
+    for(auto T:S.get_theorems())
+        std::cout << T.get_name() << '\n';
+    std::cout << S.check_consistency();
 }

@@ -4,7 +4,7 @@
 
 #ifndef AUTOMATICPROVER_GROUP_H
 #define AUTOMATICPROVER_GROUP_H
-#include "SystemWithEquality.h"
+#include "system/SystemWithEquality.h"
 #include "symbol/IdentifiedSymbol.h"
 
 class Group: public SystemWithEquality

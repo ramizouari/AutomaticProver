@@ -29,3 +29,8 @@ void System::add_clause(Clause C)
 {
     S.push_back(C);
 }
+
+void System::add_goal(Clause C) {
+    add_clause(C);
+    G.push_back(C);
+}

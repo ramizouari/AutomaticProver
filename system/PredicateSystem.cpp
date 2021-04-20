@@ -47,8 +47,10 @@ bool PredicateSystem::is_consistent() const {
 
 bool PredicateSystem::check_consistency() {
     std::queue<Clause> Q;
-    for(auto s:S)
+    for(auto s:G)
         Q.push(s);
+    std::unordered_set<Clause>P;
+    std::copy(S.begin(),S.end(),std::inserter(T,T.begin()));
     while(!Q.empty())
     {
         if(clause_count>clause_count_limit)

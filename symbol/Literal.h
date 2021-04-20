@@ -32,6 +32,7 @@ public:
     SymbolicFunction_p(): SymbolicFunction(p){}
     template<typename ...T>
     Literal operator()(T ... s) const requires (sizeof...(T)==p);
+    operator Literal() requires(p==0);
 };
 using SymbolicConstant=SymbolicFunction_p<0>;
 using SymbolicFunction_1=SymbolicFunction_p<1>;
@@ -95,5 +96,12 @@ template<int p> template<typename ...T>
 inline Literal SymbolicFunction_p<p>::operator()(T ... s) const requires (sizeof...(T)==p)
 {
     return Literal(const_cast<SymbolicFunction_p<p>*>(this),Literal(s)...);
+}
+
+template<int p>
+inline SymbolicFunction_p<p>::operator Literal() requires (p==0)
+{
+    throw std::logic_error("SymbolicConstant by reference Not supported Yet");
+    return Literal(this);
 }
 #endif //AUTOMATICPROVER_LITERAL_H
