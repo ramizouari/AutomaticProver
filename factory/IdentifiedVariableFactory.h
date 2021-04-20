@@ -12,7 +12,7 @@ template<typename I>
 class IdentifiedVariableFactory : public VariableFactory
 {
     inline static std::unordered_map<I,int> identifier_map;
-    inline static int undeterminate_counter = 0;
+    inline static int indeterminate_counter = 0;
 public:
     Variable* new_instance(I S)
     {
@@ -28,9 +28,9 @@ public:
 
     Variable* new_instance()
     {
-        undeterminate_counter++;
+        indeterminate_counter++;
         std::stringstream S;
-        S << "C" << undeterminate_counter;
+        S << "C" << indeterminate_counter;
         return new_instance(S.str());
     }
 };

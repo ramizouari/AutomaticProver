@@ -9,9 +9,11 @@
 
 class Group: public SystemWithEquality
 {
+protected:
     IdentifiedSymbolicConstant<std::string> neutral_element;
     IdentifiedSymbolicFunction_1<std::string> inverse;
-    IdentifiedSymbolicFunction_2<std::string> product;
+    IdentifiedSymbolicFunction_2<std::string> group_op;
+    Group(IdentifiedVariableFactory<std::string> &F,std::string operator_name,std::string neutral_name);
 public:
     Group(IdentifiedVariableFactory<std::string> &F);
     SymbolicConstant* get_neutral_element();

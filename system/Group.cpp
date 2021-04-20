@@ -4,18 +4,18 @@
 
 #include "Group.h"
 
-Group::Group(IdentifiedVariableFactory<std::string> &F) : SystemWithEquality(F), neutral_element("e"), product("product"),
+Group::Group(IdentifiedVariableFactory<std::string> &F) : SystemWithEquality(F), neutral_element("e"), group_op("product"),
                                                           inverse("inverse")
 {
     auto X=F.new_instance("X"),Y=F.new_instance("Y"),Z=F.new_instance("Z");
     auto U=F.new_instance("U"),V=F.new_instance("V"),W=F.new_instance("W");
     auto e=&neutral_element;
-    add_clause(equal(product(X,e),X));
-    add_clause(equal(product(e,X),X));
-    add_clause( ~equal(X,U)|~equal(Y,V)|equal(product(X,Y),product(U,V)));
-    add_clause(equal(product(X,product(Y,Z)),product(product(X,Y),Z)));
-    add_clause(equal(product(X,inverse(X)),e));
-    add_clause(equal(product(inverse(X),X),e));
+    add_clause(equal(group_op(X, e), X));
+    add_clause(equal(group_op(e, X), X));
+    add_clause( ~equal(X,U)|~equal(Y,V)|equal(group_op(X, Y), group_op(U, V)));
+    add_clause(equal(group_op(X, group_op(Y, Z)), group_op(group_op(X, Y), Z)));
+    add_clause(equal(group_op(X, inverse(X)), e));
+    add_clause(equal(group_op(inverse(X), X), e));
     rename_all();
 }
 
@@ -28,5 +28,5 @@ SymbolicFunction_1 &Group::get_inverse() {
 }
 
 SymbolicFunction_2 &Group::get_product() {
-    return product;
+    return group_op;
 }

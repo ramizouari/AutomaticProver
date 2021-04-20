@@ -22,7 +22,7 @@ int main()
     SymbolicConstant *b = new IdentifiedSymbolicConstant<std::string>("b");
     SymbolicConstant *e1 = new IdentifiedSymbolicConstant<std::string>("e1");
     SymbolicConstant *e2 = new IdentifiedSymbolicConstant<std::string>("e2");
-    SymbolicFunction_2 &product = *new IdentifiedSymbolicFunction_2<std::string>("product");
+    SymbolicFunction_2 &product = *new IdentifiedSymbolicFunction_2<std::string>("group_op");
     SymbolicFunction_1 &inverse1 = *new IdentifiedSymbolicFunction_1<std::string>("inverse1");
     SymbolicFunction_1 &inverse2 = *new IdentifiedSymbolicFunction_1<std::string>("inverse2");
 
@@ -34,7 +34,7 @@ int main()
     S.add_clause(~equal(X,U)|~equal(Y,V)|equal(product(X,Y),product(U,V)));
     S.add_clause(equal(product(X,product(Y,Z)),product(product(X,Y),Z)));
     S.add_clause(equal(product(X,Y),product(Y,X)));
-    //S.add_clause(~equal(product(X,Y),U)|~equal(product(Y,Z),V)|equal(product(U,Z),product(X,V)));
+    //S.add_clause(~equal(group_op(X,Y),U)|~equal(group_op(Y,Z),V)|equal(group_op(U,Z),group_op(X,V)));
     S.add_clause(equal(product(X,inverse1(X)),e1));
     S.add_clause(equal(product(inverse1(X),X),e1));
     S.add_clause(~equal(X,Y)|equal(inverse1(X),inverse1(Y)));
