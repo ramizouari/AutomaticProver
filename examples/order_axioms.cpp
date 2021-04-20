@@ -13,8 +13,8 @@
 #include "system/SystemWithPartialOrder.h"
 #include <string>
 #include <iostream>
-#include <system/System.h>
-
+#include <system/PredicateSystem.h>
+#include "prover/HerbrandProver.h"
 
 int main()
 {
@@ -29,11 +29,10 @@ int main()
     auto& equal=S.get_equality_symbol();
     auto X=factory.new_instance("X"),Y=factory.new_instance("Y"),Z=factory.new_instance("Z");
     S.set_limit(4e6);
-    S.add_clause(less_eq(f(X),e));
-    S.add_clause(less_eq(e,f(e)));
-    S.add_clause(~equal(e,f(e)));
+    S.add_clause(less_eq(X,e));
+    S.add_clause(less_eq(e,f(f(X))));
+    S.add_clause(~equal(e,f(f(X))));
+    HerbrandProver H_prover;
     S.rename_all();
-    for(auto T:S.get_theorems())
-        std::cout << T.get_name() << '\n';
-    std::cout << S.check_consistency();
+    std::cout << S.check_consistency(H_prover);
 }

@@ -5,8 +5,10 @@
 #include "HerbrandProver.h"
 #include <algorithm>
 #include <stack>
+#include "system/PrepositionalSystem.h"
+#include <iostream>
 
-void HerbrandProver::prove_inconsistency(const System &A)
+bool HerbrandProver::prove_inconsistency(const PredicateSystem &A)
 {
     auto C_set=A.get_hypotheseses();
     initialize(A);
@@ -14,13 +16,21 @@ void HerbrandProver::prove_inconsistency(const System &A)
     {
         //TODO: Prove for a single Herbrand iteration, then augment
         //..
-        //System S(this->A,);
+        PrepositionalSystem S(this->A);
+        if(!S.check_consistency())
+            return true;
+        std::cout << "Counter Example found for n=" << i << '\n';
+        std::cout << "Herbrand Construction: \n";
+        for(auto h:H) std::cout << h.get_name() << '\n';
+        std::cout << "\n\n";
+        std::cout << "Instances: \n";
+        for(auto a:this->A) std::cout << a.get_name() << "\n";
         augment();
     }
-
+    return false;
 }
 
-void HerbrandProver::initialize(const System &A)
+void HerbrandProver::initialize(const PredicateSystem &A)
 {
     auto F_ptr=A.get_functions();
     std::list<SymbolicFunction*> F_list;
@@ -44,7 +54,9 @@ void HerbrandProver::initialize(const System &A)
     {
         return u;
     });
-    std::copy(C_set.begin(),C_set.end(),std::back_inserter(this->A));
+    H_construction.push_back(H);
+    C_set=A.get_hypotheseses();
+    //std::copy(C_set.begin(),C_set.end(),std::back_inserter(this->A));
 }
 
 void HerbrandProver::augment()
@@ -52,13 +64,15 @@ void HerbrandProver::augment()
     using couple = std::pair<int,Literal>;
     std::vector<Literal> Q;
     std::vector<int> I;
-    int p=H.size();
+    int p=H_construction.back().size();
+    std::vector<Literal> L;
     for(auto f_ref:F_set)
     {
         auto& f=f_ref.get();
         auto m = f.arg_count();
-        Q.resize(m,H[0]);
+        Q.resize(m,H_construction.back()[0]);
         I.resize(m,0);
+        L.emplace_back(&f,Q);
         while(true)
         {
             I.back()++;
@@ -66,22 +80,26 @@ void HerbrandProver::augment()
             for(i =I.size()-1 ; i>0 && I[i]==p;i--)
             {
                 I.back()=0;
-                Q[i]=H[0];
+                Q[i]=H_construction.back()[0];
                 I[i-1]++;
             }
             if(I.front()==p)
                 break;
-            Q[i]=H[i];
-            H.emplace_back(&f,Q);
+            Q[i]=H_construction.back()[i];
+            L.emplace_back(&f,Q);
         }
-        Q[0]=H[0];
+        Q[0]=H_construction.back()[0];
         I[0]=0;
     }
+    H_construction.push_back({});
+    std::copy(L.begin(),L.end(),std::back_inserter(H));
+    std::move(L.begin(),L.end(),std::back_inserter(H_construction.back()));
     std::list<Clause> C_list;
     std::copy(C_set.begin(),C_set.end(),std::inserter(C_list,C_list.begin()));
     while(!C_list.empty())
     {
         int r=C_list.size();
+        std::list<Clause> W;
         for (auto C:C_list)
         {
             int s = C.count_variables();
@@ -91,14 +109,14 @@ void HerbrandProver::augment()
                 continue;
             }
             Variable *S=C.find_first_variable();
-            C_list.push_back(C);
             for(auto h:H)
             {
                 Clause C_ = C;
                 C_.rename(S,h);
-                C_list.push_back(C_);
+                W.push_back(C_);
             }
         }
         while(r--) C_list.pop_front();
+        C_list.insert(C_list.end(),W.begin(),W.end());
     }
 }

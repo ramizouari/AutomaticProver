@@ -3,7 +3,7 @@
 //
 
 #include "Clause.h"
-#include "system/System.h"
+#include "system/PredicateSystem.h"
 #include <stack>
 int Clause::count_variables() const {
     int R=0;

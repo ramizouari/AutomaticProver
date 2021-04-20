@@ -4,7 +4,7 @@
 
 #ifndef AUTOMATICPROVER_PROVER_H
 #define AUTOMATICPROVER_PROVER_H
-#include "system/System.h"
+#include "system/PredicateSystem.h"
 #include <unordered_set>
 
 class Prover
@@ -12,7 +12,7 @@ class Prover
     std::unordered_set<Clause> T;
 public:
     virtual ~Prover();
-    virtual void prove_inconsistency(const System &A)=0;
+    virtual bool prove_inconsistency(const PredicateSystem &A)=0;
 };
 
 

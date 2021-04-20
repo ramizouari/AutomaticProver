@@ -4,7 +4,7 @@
 
 #include "SystemWithEquality.h"
 
-SystemWithEquality::SystemWithEquality(IdentifiedVariableFactory<std::string> &_F): System(_F), equal("equal")
+SystemWithEquality::SystemWithEquality(IdentifiedVariableFactory<std::string> &_F): PredicateSystem(_F), equal("equal")
 {
     auto X=_F.new_instance("X"),Y=_F.new_instance("Y"),Z=_F.new_instance("Z");
     add_clause(equal(X,X));

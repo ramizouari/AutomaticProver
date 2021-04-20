@@ -4,11 +4,11 @@
 
 #ifndef AUTOMATICPROVER_SYSTEMWITHEQUALITY_H
 #define AUTOMATICPROVER_SYSTEMWITHEQUALITY_H
-#include "System.h"
+#include "PredicateSystem.h"
 #include "symbol/IdentifiedSymbol.h"
 #include "factory/IdentifiedVariableFactory.h"
 
-class SystemWithEquality :public System
+class SystemWithEquality :public PredicateSystem
 {
 protected:
     IdentifiedSymbolicPredicate_2<std::string> equal;

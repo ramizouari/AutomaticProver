@@ -1,5 +1,5 @@
 #include <iostream>
-#include "system/System.h"
+#include "system/PredicateSystem.h"
 #include "factory/VariableFactory.h"
 #include "factory/IdentifiedVariableFactory.h"
 #include "symbol/IdentifiedSymbol.h"

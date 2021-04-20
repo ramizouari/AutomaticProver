@@ -6,10 +6,11 @@
 #define AUTOMATICPROVER_CLAUSE_H
 #include <vector>
 #include "Predicate.h"
-class System;
+class PredicateSystem;
 class Clause : virtual public Identifiable<std::string>{
     std::vector<Predicate> predicates;
-    friend class System;
+    friend class PredicateSystem;
+    friend class PrepositionalSystem;
     friend class std::hash<Clause>;
     friend class VariableFactory;
 public:

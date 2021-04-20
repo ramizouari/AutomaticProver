@@ -8,7 +8,7 @@
 #include "factory/IdentifiedVariableFactory.h"
 #include <string>
 #include <iostream>
-#include <system/System.h>
+#include <system/PredicateSystem.h>
 #include "system/Group.h"
 
 int main()

@@ -7,7 +7,7 @@
 #include <string>
 #include "symbol/IdentifiedSymbol.h"
 #include "factory/IdentifiedVariableFactory.h"
-#include "System.h"
+#include "PredicateSystem.h"
 #include "SystemWithEquality.h"
 
 class SystemWithPartialOrder :public SystemWithEquality{
