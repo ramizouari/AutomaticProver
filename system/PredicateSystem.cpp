@@ -73,41 +73,48 @@ bool PredicateSystem::check_consistency() {
 
 bool PredicateSystem::prove(Clause C1, Clause C2, std::queue<Clause> &Q) {
     bool proof=false;
-    for(int i=0;i<C1.predicates.size();i++) for(int j=0;j<C2.predicates.size();j++)
+    for(int b=0;b<2;b++)
     {
-            Clause S1(C1),S2(C2);
-            if (auto P = pgu(S1.predicates[i], ~S2.predicates[j], S1, S2);P.has_value()) {
-                proof = true;
-                Clause R;
-                for (int s = 0; s < S1.predicates.size(); s++) {
-                    if (s == i) continue;
-                    R.predicates.push_back(S1.predicates[s]);
-                }
-                for (int s = 0; s < S2.predicates.size(); s++) {
-                    if (s == j) continue;
-                    R.predicates.push_back(S2.predicates[s]);
-                }
-                if (R.is_empty())
-                    consistent = false;
-                if (!T.contains(R))
-                {
-                    bool is_true_statement=false;
-                    for(int i=0;i<R.predicates.size();i++) for(int j=i+1;j<R.predicates.size();j++)
-                        if(unifiable(R.predicates[i],~R.predicates[j]))
-                        {
-                            is_true_statement=true;
-                            break;
-                        }
-                    if(!is_true_statement)
-                    {
-                        clause_count+=R.count_predicates();
-                        Q.push(R);
+        int p1=b?0:C1.count_affirmation(),q1=b?C1.count_affirmation():C1.count_predicates();
+        int p2=!b?0:C2.count_affirmation(),q2=!b?C2.count_affirmation():C2.count_predicates();
+        for (int i = p1; i < q1; i++)
+            for (int j = p2; j < q2; j++)
+            {
+                Clause S1(C1), S2(C2);
+                if (auto sigma = pgu(S1.predicates[i], ~S2.predicates[j]);sigma.has_value()) {
+                    sigma.value()(S1);
+                    sigma.value()(S2);
+                    proof = true;
+                    Clause R;
+                    for (int s = 0; s < S1.predicates.size(); s++) {
+                        if (s == i) continue;
+                        R |= S1.predicates[s];
                     }
+                    for (int s = 0; s < S2.predicates.size(); s++) {
+                        if (s == j) continue;
+                        R |= S2.predicates[s];
+                    }
+                    if (R.is_empty())
+                        consistent = false;
+                    if (!T.contains(R)) {
+                        bool is_true_statement = false;
+                        for (int i = 0; i < R.count_affirmation(); i++)
+                            for (int j = R.count_affirmation(); j < R.count_predicates(); j++)
+                                if (unifiable(R.predicates[i], ~R.predicates[j]))
+                                {
+                                    is_true_statement = true;
+                                    break;
+                                }
+                        if (!is_true_statement) {
+                            clause_count += R.count_predicates();
+                            Q.push(R);
+                        }
+                    }
+
+
                 }
-
-
             }
-        }
+    }
     return proof;
 }
 

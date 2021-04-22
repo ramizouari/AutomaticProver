@@ -8,7 +8,7 @@
 Predicate::Predicate(SymbolicPredicate *_P,const std::vector<Literal>&_args, bool _negated) :
 P(_P),negated(_negated),args(_args)
 {
-    if(P->arg_count() != args.size())
+    if(P!=nullptr && P->arg_count() != args.size())
         throw std::invalid_argument("predicate n-arity and arguments count do not match");
 }
 
@@ -35,6 +35,11 @@ bool Predicate::symbolically_different(Predicate P1, Predicate P2) {
 }
 
 const std::vector<Literal> Predicate::get_args() const {
+    return args;
+}
+
+std::vector<Literal>& Predicate::get_args()
+{
     return args;
 }
 
@@ -105,4 +110,8 @@ Variable *Predicate::find_first_variable() const {
     for(auto L:args) if(auto V=L.find_first_variable())
         return V;
     return nullptr;
+}
+
+bool Predicate::is_negation() const {
+    return negated;
 }

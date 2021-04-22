@@ -52,6 +52,7 @@ public:
 
     Predicate();
     const std::vector<Literal> get_args() const;
+    std::vector<Literal>& get_args();
     Predicate operator~() const;
     bool is_empty() const;
     int count_args() const;
@@ -60,6 +61,7 @@ public:
     int count_variables() const;
     Clause operator|(Predicate C) const;
     Clause operator|(Clause c) const;
+    bool is_negation() const;
     std::string get_name() override;
     Variable* find_first_variable() const;
 };

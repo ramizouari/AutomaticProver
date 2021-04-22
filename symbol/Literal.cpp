@@ -79,11 +79,11 @@ bool Literal::operator!=(Literal L)const {
 }
 
 
-Symbol* Literal::get() {
+Symbol* Literal::get() const{
     return S;
 }
 
-std::vector<Literal> Literal::get_args()
+std::vector<Literal>& Literal::get_args()
 {
     return args;
 }

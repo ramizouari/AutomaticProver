@@ -66,8 +66,8 @@ public:
     bool operator==(const Literal &c);
     bool operator!=(const Literal &c);
     bool is_variable() const;
-    std::vector<Literal> get_args();
-    Symbol* get();
+    std::vector<Literal>& get_args();
+    Symbol* get()const ;
     int count_variables() const;
     std::string get_name() override;
     Variable* find_first_variable();

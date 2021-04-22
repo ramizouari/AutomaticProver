@@ -9,6 +9,7 @@
 
 class Prover
 {
+protected:
     std::unordered_set<Clause> T;
 public:
     virtual ~Prover();

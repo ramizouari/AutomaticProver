@@ -20,7 +20,7 @@ System::System() {
 
 }
 
-std::vector<Clause> System::get_hypotheseses()const  {
+const std::vector<Clause>& System::get_hypotheseses()const  {
     return S;
 }
 
@@ -33,4 +33,8 @@ void System::add_clause(Clause C)
 void System::add_goal(Clause C) {
     add_clause(C);
     G.push_back(C);
+}
+
+const std::vector<Clause>& System::get_goals() const {
+    return G;
 }

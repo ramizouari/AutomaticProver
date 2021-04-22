@@ -23,6 +23,7 @@ int main()
     SymbolicConstant *a = new IdentifiedSymbolicConstant<std::string>("a");
     SymbolicConstant *b = new IdentifiedSymbolicConstant<std::string>("b");
     SymbolicConstant *c = new IdentifiedSymbolicConstant<std::string>("c");
+    SymbolicConstant *d = new IdentifiedSymbolicConstant<std::string>("d");
 
     Group S(factory);
     S.set_limit(4e6);
@@ -30,9 +31,15 @@ int main()
     auto &inverse=S.get_inverse();
     auto &product=S.get_product();
     auto e=S.get_neutral_element();
-    S.add_clause(equal(X,e)|equal(Y,a));
-    S.add_clause(~equal(a,e));
-    S.add_goal(equal(inverse(a),e));
+    S.add_goal(equal(product(a,b),product(a,c)));
+    S.add_goal(~equal(b,c));
+    Substitution sigma;
+    Clause C1=equal(X,X);
+    Clause C2=~equal(U,e)|~equal(a,U);
+    //sigma.to_normal_form();
+    sigma = pgu(equal(X,e),equal(U,U)).value();
+    sigma(C1);
+    sigma(C2);
     // S.add_goal(~equal(inverse(inverse(e)),e));
 
     S.rename_all();
